@@ -1,0 +1,95 @@
+/* Question1: Create a Mysql Database trigger for the following:
+
+MySQL Database: Create an After Insert trigger, After Update, After Delete trigger on the SCORE table.
+Include the following columns in addition to the columns for these tables.
+1. CREATE_DATE, to track the date record gets created.
+2. HISTORY_DATE, to track the date when changes are done to the record.
+3. USER, to track the changes done by the user.
+4. STATUS column to track the type of operation on these tables.
+Please submit all the required files.
+
+*/
+
+DELIMITER $
+
+DROP TRIGGER IF EXISTS STUDENTDB.SCORE_T_INSERT$
+DROP TRIGGER IF EXISTS STUDENTDB.SCORE_T_UPDATE$
+DROP TRIGGER IF EXISTS STUDENTDB.SCORE_T_DELETE$
+
+-- DROP TRIGGER IF EXISTS SCORE_T_INSERT$
+-- DROP TRIGGER IF EXISTS SCORE_T_UPDATE$
+-- DROP TRIGGER IF EXISTS SCORE_T_DELETE$
+
+CREATE TABLE SCORE_T AS SELECT * FROM SCORE WHERE 1=0$
+ALTER TABLE SCORE_T ADD ACTION VARCHAR(100)$
+ALTER TABLE SCORE_T ADD USERNAME VARCHAR(100)$
+
+CREATE TRIGGER SCORE_T_INSERT AFTER INSERT ON SCORE FOR EACH ROW
+BEGIN
+		INSERT INTO SCORE_T
+		(STUDENT_ID
+		,EVENT_ID
+		,SCORE
+		,CREATE_DATE
+		,GPA
+		,ACTION
+		,USERNAME
+		) VALUES
+		(
+		NEW.STUDENT_ID
+		,NEW.EVENT_ID
+		,NEW.SCORE
+		,CURRENT_TIMESTAMP()
+		,NEW.GPA
+		,'INSERT'
+		,USER()
+		);
+
+END$
+
+CREATE TRIGGER SCORE_T_UPDATE AFTER INSERT ON SCORE FOR EACH ROW
+BEGIN
+		INSERT INTO SCORE_T
+		(STUDENT_ID
+		,EVENT_ID
+		,SCORE
+		,CREATE_DATE
+		,GPA
+		,ACTION
+		,USERNAME
+		) VALUES
+		(
+		NEW.STUDENT_ID
+		,NEW.EVENT_ID
+		,NEW.SCORE
+		,CURRENT_TIMESTAMP()
+		,NEW.GPA
+		,'UPDATE'
+		,USER()
+		);
+
+END$
+
+CREATE TRIGGER SCORE_T_DELETE AFTER DELETE ON SCORE FOR EACH ROW
+BEGIN
+		INSERT INTO SCORE_T
+		(STUDENT_ID
+		,EVENT_ID
+		,SCORE
+		,CREATE_DATE
+		,GPA
+		,ACTION
+		,USERNAME
+		) VALUES
+		(
+		OLD.STUDENT_ID
+		,OLD.EVENT_ID
+		,OLD.SCORE
+		,CURRENT_TIMESTAMP()
+		,OLD.GPA
+		,'DELETE'
+		,USER()
+		);
+
+END$
+DELIMITER ;
